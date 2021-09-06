@@ -1,5 +1,6 @@
 import * as express from "express";
-import { Cat, CatType } from "./app.model";
+import catsRouter from "./cats/cats.route";
+
 const app: express.Express = express();
 
 // * logging middleware
@@ -15,60 +16,7 @@ app.use((req, res, next) => {
 //express에서 body(json)를 읽을수 있도록 미들웨어를 추가해줘야한다.
 app.use(express.json());
 
-// * READ 고양이 전체 데이터 다 조회
-app.get("/cats", (req, res) => {
-    try {
-        const cats = Cat;
-        // throw new Error("db connect error");
-        res.status(200).send({
-            success: true,
-            data: {
-                cats,
-            },
-        });
-    } catch (error) {
-        res.status(400).send({
-            success: false,
-            error: error.message,
-        });
-    }
-});
-
-// * READ 특정 고양이 데이터 조회
-// :id는 파라미터가 되어서 동적라우팅이 된다.
-app.get("/cats/:id", (req, res) => {
-    try {
-        const params = req.params;
-        console.log(params);
-        const cat = Cat.find((cat) => {
-            return cat.id === params.id;
-        });
-        // throw new Error("db connect error");
-        res.status(200).send({
-            success: true,
-            data: {
-                cat,
-            },
-        });
-    } catch (error) {
-        res.status(400).send({
-            success: false,
-            error: error.message,
-        });
-    }
-});
-
-// * CREATE 새로운 고양이 추가 api
-app.post("/cats", (req, res) => {
-    try {
-        const data = req.body;
-        Cat.push(data); // CREATE
-        res.status(200).send({
-            success: true,
-            data: { data },
-        });
-    } catch (error) {}
-});
+app.use(catsRouter);
 
 // * 404 middleware
 // 아무 라우터에 해당이 되지 않는다면 마지막에 에러를 잡는 미들웨어를 생성한다.
